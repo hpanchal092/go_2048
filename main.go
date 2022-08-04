@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// size of the board, always a square, ex: 4 means 4x4
 const BOARD_SIZE int = 4
 
 // store the information for a tile in a simple struct
@@ -17,17 +18,13 @@ const BOARD_SIZE int = 4
 // }
 
 func main() {
+	// randomize the seed because it isn't random by default
 	seed := time.Now().Unix()
 	rand.Seed(seed)
 
 	fmt.Println("Welcome to GO 2048!")
 
-	game_board := [BOARD_SIZE][BOARD_SIZE]*int{}
-	for i := 0; i < BOARD_SIZE; i++ {
-		for j := 0; j < BOARD_SIZE; j++ {
-			game_board[i][j] = new(int)
-		}
-	}
+	game_board := [BOARD_SIZE][BOARD_SIZE]int{}
 
 	// game loop omg like python games course 😱
 	for {
@@ -36,19 +33,19 @@ func main() {
 			return
 		}
 
-		printBoard(game_board)
+		printBoard(&game_board)
 
 		input := get_input()
 		move(input, &game_board)
 	}
 }
 
-func printBoard(b [BOARD_SIZE][BOARD_SIZE]*int) {
+func printBoard(b *[BOARD_SIZE][BOARD_SIZE]int) {
 	// prints the board i dont know what else to say
 	fmt.Printf("\n")
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
-			fmt.Printf("%d ", *(b[i][j]))
+			fmt.Printf("%d ", b[i][j])
 		}
 		fmt.Printf("\n")
 	}
@@ -87,18 +84,17 @@ func is_valid(s *string) bool {
 	return false
 }
 
-func add_tile(b *[BOARD_SIZE][BOARD_SIZE]*int) bool {
+func add_tile(b *[BOARD_SIZE][BOARD_SIZE]int) bool {
 	// takes in the board and returns true if it adds a tile successfully
 	// returns false if unsuccessful aka the board is full
 	var val int
 
 	// create a slice of all of the empty tiles (tiles with a value of 0)
-	// *((*b)[i][j]) 💀😭💀
-	empty_tiles := []*int{}
+	empty_tiles := make([]*int, 0, 16)
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
-			if *((*b)[i][j]) == 0 {
-				empty_tiles = append(empty_tiles, (*b)[i][j])
+			if (*b)[i][j] == 0 {
+				empty_tiles = append(empty_tiles, &(*b)[i][j])
 			}
 		}
 	}
@@ -124,13 +120,61 @@ func add_tile(b *[BOARD_SIZE][BOARD_SIZE]*int) bool {
 	return true
 }
 
-func move(input string, b *[BOARD_SIZE][BOARD_SIZE]*int) {
+// move code below to separate file eventually, or not idk
+func move(input string, b *[BOARD_SIZE][BOARD_SIZE]int) {
 	// how tf am i going to make the tiles move 😭
-	fmt.Printf("TODO LMAO\n")
 	switch input {
 	case "u":
+		fmt.Printf("TODO LMAO\n")
 	case "d":
+		fmt.Printf("TODO LMAO\n")
 	case "l":
+		move_left(b)
 	case "r":
+		move_right(b)
+	}
+}
+
+func move_left(b *[BOARD_SIZE][BOARD_SIZE]int) {
+	// don't ask me how it works cuz idk
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := 0; j < BOARD_SIZE; j++ {
+			if (*b)[i][j] != 0 {
+				for pos := j; pos != 0; pos-- {
+					curr_tile := &(*b)[i][pos]
+					dest_tile := &(*b)[i][pos-1]
+
+					if *dest_tile == 0 { // slide
+						*dest_tile = *curr_tile
+						*curr_tile = 0
+					} else if *dest_tile == *curr_tile { // merge
+						*dest_tile = *curr_tile * 2
+						*curr_tile = 0
+					}
+				}
+			}
+		}
+	}
+}
+
+func move_right(b *[BOARD_SIZE][BOARD_SIZE]int) {
+	// don't ask me how it works cuz idk
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := BOARD_SIZE - 1; j >= 0; j-- {
+			if (*b)[i][j] != 0 {
+				for pos := j; pos != BOARD_SIZE-1; pos++ {
+					curr_tile := &(*b)[i][pos]
+					dest_tile := &(*b)[i][pos+1]
+
+					if *dest_tile == 0 { // slide
+						*dest_tile = *curr_tile
+						*curr_tile = 0
+					} else if *dest_tile == *curr_tile { // merge
+						*dest_tile = *curr_tile * 2
+						*curr_tile = 0
+					}
+				}
+			}
+		}
 	}
 }

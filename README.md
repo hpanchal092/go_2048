@@ -1,5 +1,7 @@
 # go_2048
 
+## description
+
 it's a cli 2048 game in golang. i don't know what else to say. it doesn't work
 right now
 
@@ -21,3 +23,7 @@ at 2048 (hopefully).
    me build the algorithm later
  - put things into multiple files so i don't have one large main.go file
 
+## build instructions
+
+make sure you have go installed, clone the repo and run `go build` inside the
+directory. after that you can put the binary or executable wherever you want
