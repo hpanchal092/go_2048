@@ -24,19 +24,19 @@ func main() {
 
 	fmt.Println("Welcome to GO 2048!")
 
-	game_board := [BOARD_SIZE][BOARD_SIZE]int{}
+	gameBoard := [BOARD_SIZE][BOARD_SIZE]int{}
 
 	// game loop omg like python games course 😱
 	for {
-		if add_tile(&game_board) == false {
+		if addTile(&gameBoard) == false {
 			fmt.Printf("\nyou lost dumbass 🤡\n")
 			return
 		}
 
-		printBoard(&game_board)
+		printBoard(&gameBoard)
 
-		input := get_input()
-		move(input, &game_board)
+		input := getInput()
+		move(input, &gameBoard)
 	}
 }
 
@@ -52,22 +52,22 @@ func printBoard(b *[BOARD_SIZE][BOARD_SIZE]int) {
 	fmt.Printf("\n")
 }
 
-func get_input() string {
+func getInput() string {
 	// gets input from the user, either u, d, l, or r
-	var user_input string
+	var userInput string
 
-	for !is_valid(&user_input) {
+	for !isValid(&userInput) {
 		fmt.Printf("Enter an input (u/d/l/r): ")
-		fmt.Scanf("%s", &user_input)
+		fmt.Scanf("%s", &userInput)
 	}
 
-	return user_input
+	return userInput
 }
 
-func is_valid(s *string) bool {
+func isValid(s *string) bool {
 	// takes in a string s and checks if it is a valid input, returns a bool
 	// valid inputs start with the letter u, d, l, or r (case insensitive)
-	valid_inputs := [4]string{"u", "d", "l", "r"}
+	validInputs := [4]string{"u", "d", "l", "r"}
 
 	if len(*s) == 0 {
 		fmt.Println("Please enter an input")
@@ -75,8 +75,8 @@ func is_valid(s *string) bool {
 	}
 	*s = strings.ToLower(*s)
 	*s = (*s)[:1]
-	for i := 0; i < len(valid_inputs); i++ {
-		if *s == valid_inputs[i] {
+	for i := 0; i < len(validInputs); i++ {
+		if *s == validInputs[i] {
 			return true
 		}
 	}
@@ -84,35 +84,33 @@ func is_valid(s *string) bool {
 	return false
 }
 
-func add_tile(b *[BOARD_SIZE][BOARD_SIZE]int) bool {
+func addTile(b *[BOARD_SIZE][BOARD_SIZE]int) bool {
 	// takes in the board and returns true if it adds a tile successfully
 	// returns false if unsuccessful aka the board is full
-	var val int
 
 	// create a slice of all of the empty tiles (tiles with a value of 0)
-	empty_tiles := make([]*int, 0, 16)
+	emptyTiles := make([]*int, 0, 16)
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
 			if (*b)[i][j] == 0 {
-				empty_tiles = append(empty_tiles, &(*b)[i][j])
+				emptyTiles = append(emptyTiles, &(*b)[i][j])
 			}
 		}
 	}
 
-	if len(empty_tiles) == 0 {
+	if len(emptyTiles) == 0 {
 		return false
 	}
 
 	// pick a random tile from the empty tiles
-	tile := empty_tiles[rand.Intn(len(empty_tiles))]
+	tile := emptyTiles[rand.Intn(len(emptyTiles))]
 
 	// pick a value, mostly 2, 10% chance it is a 4
+    val := 2
 	percent := rand.Intn(10)
 	if percent == 0 {
 		val = 4
-	} else {
-		val = 2
-	}
+    }
 
 	// assign the value to the tile
 	*tile = val
@@ -129,27 +127,28 @@ func move(input string, b *[BOARD_SIZE][BOARD_SIZE]int) {
 	case "d":
 		fmt.Printf("TODO LMAO\n")
 	case "l":
-		move_left(b)
+		moveLeft(b)
 	case "r":
-		move_right(b)
+		moveRight(b)
 	}
 }
 
-func move_left(b *[BOARD_SIZE][BOARD_SIZE]int) {
+func moveLeft(b *[BOARD_SIZE][BOARD_SIZE]int) {
 	// don't ask me how it works cuz idk
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
 			if (*b)[i][j] != 0 {
 				for pos := j; pos != 0; pos-- {
-					curr_tile := &(*b)[i][pos]
-					dest_tile := &(*b)[i][pos-1]
+					currTile := &(*b)[i][pos]
+					nextTile := &(*b)[i][pos-1]
 
-					if *dest_tile == 0 { // slide
-						*dest_tile = *curr_tile
-						*curr_tile = 0
-					} else if *dest_tile == *curr_tile { // merge
-						*dest_tile = *curr_tile * 2
-						*curr_tile = 0
+					if *nextTile == 0 { // slide
+						*nextTile = *currTile
+						*currTile = 0
+					} else if *nextTile == *currTile { // merge
+						*nextTile = *currTile * 2
+						*currTile = 0
+                        break
 					}
 				}
 			}
@@ -157,21 +156,22 @@ func move_left(b *[BOARD_SIZE][BOARD_SIZE]int) {
 	}
 }
 
-func move_right(b *[BOARD_SIZE][BOARD_SIZE]int) {
+func moveRight(b *[BOARD_SIZE][BOARD_SIZE]int) {
 	// don't ask me how it works cuz idk
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := BOARD_SIZE - 1; j >= 0; j-- {
 			if (*b)[i][j] != 0 {
 				for pos := j; pos != BOARD_SIZE-1; pos++ {
-					curr_tile := &(*b)[i][pos]
-					dest_tile := &(*b)[i][pos+1]
+					currTile := &(*b)[i][pos]
+					nextTile := &(*b)[i][pos+1]
 
-					if *dest_tile == 0 { // slide
-						*dest_tile = *curr_tile
-						*curr_tile = 0
-					} else if *dest_tile == *curr_tile { // merge
-						*dest_tile = *curr_tile * 2
-						*curr_tile = 0
+					if *nextTile == 0 { // slide
+						*nextTile = *currTile
+						*currTile = 0
+					} else if *nextTile == *currTile { // merge
+						*nextTile = *currTile * 2
+						*currTile = 0
+                        break
 					}
 				}
 			}
