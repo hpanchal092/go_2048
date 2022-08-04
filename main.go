@@ -10,13 +10,6 @@ import (
 // size of the board, always a square, ex: 4 means 4x4
 const BOARD_SIZE int = 4
 
-// store the information for a tile in a simple struct
-// lmao i'm not using it right now, maybe if i need to store other info later?
-
-// type tile struct {
-// 	x, y, val int
-// }
-
 func main() {
 	// randomize the seed because it isn't random by default
 	seed := time.Now().Unix()
@@ -106,11 +99,11 @@ func addTile(b *[BOARD_SIZE][BOARD_SIZE]int) bool {
 	tile := emptyTiles[rand.Intn(len(emptyTiles))]
 
 	// pick a value, mostly 2, 10% chance it is a 4
-    val := 2
-	percent := rand.Intn(10)
-	if percent == 0 {
+	val := 2
+	chance := rand.Intn(10)
+	if chance == 0 {
 		val = 4
-    }
+	}
 
 	// assign the value to the tile
 	*tile = val
@@ -120,16 +113,61 @@ func addTile(b *[BOARD_SIZE][BOARD_SIZE]int) bool {
 
 // move code below to separate file eventually, or not idk
 func move(input string, b *[BOARD_SIZE][BOARD_SIZE]int) {
-	// how tf am i going to make the tiles move 😭
 	switch input {
 	case "u":
-		fmt.Printf("TODO LMAO\n")
+		moveUp(b)
 	case "d":
-		fmt.Printf("TODO LMAO\n")
+		moveDown(b)
 	case "l":
 		moveLeft(b)
 	case "r":
 		moveRight(b)
+	}
+}
+
+func moveUp(b *[BOARD_SIZE][BOARD_SIZE]int) {
+	// don't ask me how it works cuz idk
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := 0; j < BOARD_SIZE; j++ {
+			if (*b)[i][j] != 0 {
+				for pos := i; pos != 0; pos-- {
+					currTile := &(*b)[pos][j]
+					nextTile := &(*b)[pos-1][j]
+
+					if *nextTile == 0 { // slide
+						*nextTile = *currTile
+						*currTile = 0
+					} else if *nextTile == *currTile { // merge
+						*nextTile = *currTile * 2
+						*currTile = 0
+						break
+					}
+				}
+			}
+		}
+	}
+}
+
+func moveDown(b *[BOARD_SIZE][BOARD_SIZE]int) {
+	// don't ask me how it works cuz idk
+	for i := BOARD_SIZE - 1; i >= 0; i-- {
+		for j := 0; j < BOARD_SIZE; j++ {
+			if (*b)[i][j] != 0 {
+				for pos := i; pos != BOARD_SIZE-1; pos++ {
+					currTile := &(*b)[pos][j]
+					nextTile := &(*b)[pos+1][j]
+
+					if *nextTile == 0 { // slide
+						*nextTile = *currTile
+						*currTile = 0
+					} else if *nextTile == *currTile { // merge
+						*nextTile = *currTile * 2
+						*currTile = 0
+						break
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -148,7 +186,7 @@ func moveLeft(b *[BOARD_SIZE][BOARD_SIZE]int) {
 					} else if *nextTile == *currTile { // merge
 						*nextTile = *currTile * 2
 						*currTile = 0
-                        break
+						break
 					}
 				}
 			}
@@ -171,7 +209,7 @@ func moveRight(b *[BOARD_SIZE][BOARD_SIZE]int) {
 					} else if *nextTile == *currTile { // merge
 						*nextTile = *currTile * 2
 						*currTile = 0
-                        break
+						break
 					}
 				}
 			}
