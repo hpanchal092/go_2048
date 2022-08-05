@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 	"strings"
 	"time"
@@ -24,14 +25,14 @@ func main() {
 		addTile(&gameBoard)
 		printBoard(&gameBoard)
 
-        moves := checkValidMoves(&gameBoard)
-        if (len(moves) == 0) {
-            fmt.Println("you lost 🤡")
-            time.Sleep(time.Second * 3)
-            return
-        }
+		moves := checkValidMoves(&gameBoard)
+		if len(moves) == 0 {
+			fmt.Println("you lost 🤡")
+			time.Sleep(time.Second * 3)
+			return
+		}
 		input := getInput(&moves)
-        move(input, &gameBoard)
+		move(input, &gameBoard)
 	}
 }
 
@@ -113,39 +114,39 @@ func addTile(b *[BOARD_SIZE][BOARD_SIZE]int) bool {
 
 // move code below to separate file eventually, or not idk
 func checkValidMoves(b *[BOARD_SIZE][BOARD_SIZE]int) []string {
-    output := make([]string, 0, 4)
+	output := make([]string, 0, 4)
 
-    uB := moveUp(*b)
-    dB := moveDown(*b)
-    lB := moveLeft(*b)
-    rB := moveRight(*b)
-    
-    if *b != uB {
-        output = append(output, "u")
-    }
-    if *b != dB {
-        output = append(output, "d")
-    }
-    if *b != lB {
-        output = append(output, "l")
-    }
-    if *b != rB {
-        output = append(output, "r")
-    }
+	uB := moveUp(*b)
+	dB := moveDown(*b)
+	lB := moveLeft(*b)
+	rB := moveRight(*b)
 
-    return output
+	if *b != uB {
+		output = append(output, "u")
+	}
+	if *b != dB {
+		output = append(output, "d")
+	}
+	if *b != lB {
+		output = append(output, "l")
+	}
+	if *b != rB {
+		output = append(output, "r")
+	}
+
+	return output
 }
 
 func move(input string, b *[BOARD_SIZE][BOARD_SIZE]int) {
 	switch input {
 	case "u":
-        *b = moveUp(*b)
+		*b = moveUp(*b)
 	case "d":
-        *b = moveDown(*b)
+		*b = moveDown(*b)
 	case "l":
-        *b = moveLeft(*b)
+		*b = moveLeft(*b)
 	case "r":
-        *b = moveRight(*b)
+		*b = moveRight(*b)
 	}
 }
 
@@ -161,8 +162,8 @@ func moveUp(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 					if *nextTile == 0 { // slide
 						*nextTile = *currTile
 						*currTile = 0
-					} else if *nextTile == *currTile { // merge
-						*nextTile = *currTile * 2
+					} else if *nextTile == *currTile {
+						*nextTile = *currTile * -2
 						*currTile = 0
 						break
 					}
@@ -170,6 +171,12 @@ func moveUp(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 			}
 		}
 	}
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := 0; j < BOARD_SIZE; j++ {
+			b[i][j] = int(math.Abs(float64(b[i][j])))
+		}
+	}
+
 	return b
 }
 
@@ -185,8 +192,8 @@ func moveDown(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 					if *nextTile == 0 { // slide
 						*nextTile = *currTile
 						*currTile = 0
-					} else if *nextTile == *currTile { // merge
-						*nextTile = *currTile * 2
+					} else if *nextTile == *currTile {
+						*nextTile = *currTile * -2
 						*currTile = 0
 						break
 					}
@@ -194,6 +201,12 @@ func moveDown(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 			}
 		}
 	}
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := 0; j < BOARD_SIZE; j++ {
+			b[i][j] = int(math.Abs(float64(b[i][j])))
+		}
+	}
+
 	return b
 }
 
@@ -209,8 +222,8 @@ func moveLeft(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 					if *nextTile == 0 { // slide
 						*nextTile = *currTile
 						*currTile = 0
-					} else if *nextTile == *currTile { // merge
-						*nextTile = *currTile * 2
+					} else if *nextTile == *currTile {
+						*nextTile = *currTile * -2
 						*currTile = 0
 						break
 					}
@@ -218,6 +231,12 @@ func moveLeft(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 			}
 		}
 	}
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := 0; j < BOARD_SIZE; j++ {
+			b[i][j] = int(math.Abs(float64(b[i][j])))
+		}
+	}
+
 	return b
 }
 
@@ -233,8 +252,8 @@ func moveRight(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 					if *nextTile == 0 { // slide
 						*nextTile = *currTile
 						*currTile = 0
-					} else if *nextTile == *currTile { // merge
-						*nextTile = *currTile * 2
+					} else if *nextTile == *currTile {
+						*nextTile = *currTile * -2
 						*currTile = 0
 						break
 					}
@@ -242,5 +261,11 @@ func moveRight(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 			}
 		}
 	}
+	for i := 0; i < BOARD_SIZE; i++ {
+		for j := 0; j < BOARD_SIZE; j++ {
+			b[i][j] = int(math.Abs(float64(b[i][j])))
+		}
+	}
+
 	return b
 }
