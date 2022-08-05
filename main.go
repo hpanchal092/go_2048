@@ -21,15 +21,17 @@ func main() {
 
 	// game loop omg like python games course 😱
 	for {
-		if addTile(&gameBoard) == false {
-			fmt.Printf("\nyou lost dumbass 🤡\n")
-			return
-		}
-
+		addTile(&gameBoard)
 		printBoard(&gameBoard)
 
-		input := getInput()
-		move(input, &gameBoard)
+        moves := checkValidMoves(&gameBoard)
+        if (len(moves) == 0) {
+            fmt.Println("you lost 🤡")
+            time.Sleep(time.Second * 3)
+            return
+        }
+		input := getInput(&moves)
+        move(input, &gameBoard)
 	}
 }
 
@@ -45,11 +47,11 @@ func printBoard(b *[BOARD_SIZE][BOARD_SIZE]int) {
 	fmt.Printf("\n")
 }
 
-func getInput() string {
+func getInput(moves *[]string) string {
 	// gets input from the user, either u, d, l, or r
 	var userInput string
 
-	for !isValid(&userInput) {
+	for !isValid(&userInput, moves) {
 		fmt.Printf("Enter an input (u/d/l/r): ")
 		fmt.Scanf("%s", &userInput)
 	}
@@ -57,19 +59,17 @@ func getInput() string {
 	return userInput
 }
 
-func isValid(s *string) bool {
+func isValid(s *string, moves *[]string) bool {
 	// takes in a string s and checks if it is a valid input, returns a bool
 	// valid inputs start with the letter u, d, l, or r (case insensitive)
-	validInputs := [4]string{"u", "d", "l", "r"}
 
 	if len(*s) == 0 {
-		fmt.Println("Please enter an input")
 		return false
 	}
 	*s = strings.ToLower(*s)
 	*s = (*s)[:1]
-	for i := 0; i < len(validInputs); i++ {
-		if *s == validInputs[i] {
+	for i := 0; i < len(*moves); i++ {
+		if *s == (*moves)[i] {
 			return true
 		}
 	}
@@ -112,27 +112,51 @@ func addTile(b *[BOARD_SIZE][BOARD_SIZE]int) bool {
 }
 
 // move code below to separate file eventually, or not idk
+func checkValidMoves(b *[BOARD_SIZE][BOARD_SIZE]int) []string {
+    output := make([]string, 0, 4)
+
+    uB := moveUp(*b)
+    dB := moveDown(*b)
+    lB := moveLeft(*b)
+    rB := moveRight(*b)
+    
+    if *b != uB {
+        output = append(output, "u")
+    }
+    if *b != dB {
+        output = append(output, "d")
+    }
+    if *b != lB {
+        output = append(output, "l")
+    }
+    if *b != rB {
+        output = append(output, "r")
+    }
+
+    return output
+}
+
 func move(input string, b *[BOARD_SIZE][BOARD_SIZE]int) {
 	switch input {
 	case "u":
-		moveUp(b)
+        *b = moveUp(*b)
 	case "d":
-		moveDown(b)
+        *b = moveDown(*b)
 	case "l":
-		moveLeft(b)
+        *b = moveLeft(*b)
 	case "r":
-		moveRight(b)
+        *b = moveRight(*b)
 	}
 }
 
-func moveUp(b *[BOARD_SIZE][BOARD_SIZE]int) {
+func moveUp(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 	// don't ask me how it works cuz idk
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
-			if (*b)[i][j] != 0 {
+			if (b)[i][j] != 0 {
 				for pos := i; pos != 0; pos-- {
-					currTile := &(*b)[pos][j]
-					nextTile := &(*b)[pos-1][j]
+					currTile := &b[pos][j]
+					nextTile := &b[pos-1][j]
 
 					if *nextTile == 0 { // slide
 						*nextTile = *currTile
@@ -146,16 +170,17 @@ func moveUp(b *[BOARD_SIZE][BOARD_SIZE]int) {
 			}
 		}
 	}
+	return b
 }
 
-func moveDown(b *[BOARD_SIZE][BOARD_SIZE]int) {
+func moveDown(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 	// don't ask me how it works cuz idk
 	for i := BOARD_SIZE - 1; i >= 0; i-- {
 		for j := 0; j < BOARD_SIZE; j++ {
-			if (*b)[i][j] != 0 {
+			if b[i][j] != 0 {
 				for pos := i; pos != BOARD_SIZE-1; pos++ {
-					currTile := &(*b)[pos][j]
-					nextTile := &(*b)[pos+1][j]
+					currTile := &b[pos][j]
+					nextTile := &b[pos+1][j]
 
 					if *nextTile == 0 { // slide
 						*nextTile = *currTile
@@ -169,16 +194,17 @@ func moveDown(b *[BOARD_SIZE][BOARD_SIZE]int) {
 			}
 		}
 	}
+	return b
 }
 
-func moveLeft(b *[BOARD_SIZE][BOARD_SIZE]int) {
+func moveLeft(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 	// don't ask me how it works cuz idk
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := 0; j < BOARD_SIZE; j++ {
-			if (*b)[i][j] != 0 {
+			if b[i][j] != 0 {
 				for pos := j; pos != 0; pos-- {
-					currTile := &(*b)[i][pos]
-					nextTile := &(*b)[i][pos-1]
+					currTile := &b[i][pos]
+					nextTile := &b[i][pos-1]
 
 					if *nextTile == 0 { // slide
 						*nextTile = *currTile
@@ -192,16 +218,17 @@ func moveLeft(b *[BOARD_SIZE][BOARD_SIZE]int) {
 			}
 		}
 	}
+	return b
 }
 
-func moveRight(b *[BOARD_SIZE][BOARD_SIZE]int) {
+func moveRight(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
 	// don't ask me how it works cuz idk
 	for i := 0; i < BOARD_SIZE; i++ {
 		for j := BOARD_SIZE - 1; j >= 0; j-- {
-			if (*b)[i][j] != 0 {
+			if b[i][j] != 0 {
 				for pos := j; pos != BOARD_SIZE-1; pos++ {
-					currTile := &(*b)[i][pos]
-					nextTile := &(*b)[i][pos+1]
+					currTile := &b[i][pos]
+					nextTile := &b[i][pos+1]
 
 					if *nextTile == 0 { // slide
 						*nextTile = *currTile
@@ -215,4 +242,5 @@ func moveRight(b *[BOARD_SIZE][BOARD_SIZE]int) {
 			}
 		}
 	}
+	return b
 }
