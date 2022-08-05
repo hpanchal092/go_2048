@@ -2,8 +2,7 @@
 
 ## description
 
-it's a cli 2048 game in golang. i don't know what else to say. it doesn't work
-right now
+it's a cli 2048 game in golang. i don't know what else to say.
 
 ## long term plan
 
@@ -16,14 +15,17 @@ at 2048 (hopefully).
 
 ## short term plan
 
- - make the tiles actually move 😭
- - make sure the tiles actually merge with each other
- - add comments to everything
+ - ~~make the tiles actually move 😭~~
+ - ~~make sure the tiles actually merge with each other~~
+ - add comments to everything (almost done)
  - split things up into smaller functions, specifically in a way that will help
-   me build the algorithm later
+   me build the algorithm later (specifically need to rewrite the movement
+   functions to be readable)
  - put things into multiple files so i don't have one large main.go file
+   (decided not to do this since the file isn't that long anyway)
 
 ## build instructions
 
-make sure you have go installed, clone the repo and run `go build` inside the
-directory. after that you can put the binary or executable wherever you want
+make sure you have go installed, clone the repo and run `go build` or `go
+install` inside the directory. after that you can put the binary or executable
+wherever you want
