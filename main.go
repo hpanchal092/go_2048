@@ -9,7 +9,7 @@ import (
 )
 
 // size of the board, always a square, ex: 4 means 4x4
-const BOARD_SIZE int = 4
+const SIZE int = 4
 
 func main() {
 	// randomize the seed because it isn't random by default
@@ -18,7 +18,7 @@ func main() {
 
 	fmt.Println("Welcome to GO 2048!")
 
-	gameBoard := [BOARD_SIZE][BOARD_SIZE]int{}
+	gameBoard := [SIZE][SIZE]int{}
 
 	// game loop omg like python games course 😱
 	for {
@@ -36,11 +36,11 @@ func main() {
 	}
 }
 
-func printBoard(b *[BOARD_SIZE][BOARD_SIZE]int) {
+func printBoard(b *[SIZE][SIZE]int) {
 	// prints the board i dont know what else to say
 	fmt.Printf("\n")
-	for i := 0; i < BOARD_SIZE; i++ {
-		for j := 0; j < BOARD_SIZE; j++ {
+	for i := 0; i < SIZE; i++ {
+		for j := 0; j < SIZE; j++ {
 			fmt.Printf("%d ", b[i][j])
 		}
 		fmt.Printf("\n")
@@ -78,14 +78,14 @@ func isValid(s *string, moves *[]string) bool {
 	return false
 }
 
-func addTile(b *[BOARD_SIZE][BOARD_SIZE]int) bool {
+func addTile(b *[SIZE][SIZE]int) bool {
 	// takes in the board and returns true if it adds a tile successfully
 	// returns false if unsuccessful aka the board is full
 
 	// create a slice of all of the empty tiles (tiles with a value of 0)
 	emptyTiles := make([]*int, 0, 16)
-	for i := 0; i < BOARD_SIZE; i++ {
-		for j := 0; j < BOARD_SIZE; j++ {
+	for i := 0; i < SIZE; i++ {
+		for j := 0; j < SIZE; j++ {
 			if (*b)[i][j] == 0 {
 				emptyTiles = append(emptyTiles, &(*b)[i][j])
 			}
@@ -113,13 +113,20 @@ func addTile(b *[BOARD_SIZE][BOARD_SIZE]int) bool {
 }
 
 // move code below to separate file eventually, or not idk
-func checkValidMoves(b *[BOARD_SIZE][BOARD_SIZE]int) []string {
+func checkValidMoves(b *[SIZE][SIZE]int) []string {
 	output := make([]string, 0, 4)
 
-	uB := moveUp(*b)
-	dB := moveDown(*b)
-	lB := moveLeft(*b)
-	rB := moveRight(*b)
+	uB := *b
+	move("u", &uB)
+
+	dB := *b
+	move("d", &dB)
+
+	lB := *b
+	move("l", &lB)
+
+	rB := *b
+	move("r", &rB)
 
 	if *b != uB {
 		output = append(output, "u")
@@ -137,135 +144,82 @@ func checkValidMoves(b *[BOARD_SIZE][BOARD_SIZE]int) []string {
 	return output
 }
 
-func move(input string, b *[BOARD_SIZE][BOARD_SIZE]int) {
-	switch input {
-	case "u":
-		*b = moveUp(*b)
-	case "d":
-		*b = moveDown(*b)
-	case "l":
-		*b = moveLeft(*b)
-	case "r":
-		*b = moveRight(*b)
+func move(input string, b *[SIZE][SIZE]int) {
+	slice := []*int{}
+	for i := 0; i < SIZE; i++ {
+		switch input {
+		case "u":
+			slice = createVerticalSlice(b, i, true)
+		case "d":
+			slice = createVerticalSlice(b, i, false)
+		case "l":
+			slice = createHorizontalSlice(b, i, true)
+		case "r":
+			slice = createHorizontalSlice(b, i, false)
+		}
+
+		slideAndMerge(slice)
 	}
 }
 
-func moveUp(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
-	// don't ask me how it works cuz idk
-	for i := 0; i < BOARD_SIZE; i++ {
-		for j := 0; j < BOARD_SIZE; j++ {
-			if (b)[i][j] != 0 {
-				for pos := i; pos != 0; pos-- {
-					currTile := &b[pos][j]
-					nextTile := &b[pos-1][j]
+func slideAndMerge(s []*int) {
+	for i := 1; i < SIZE; i++ {
+		if *s[i] != 0 {
+			for pos := i; pos > 0; pos-- {
+				currTile := s[pos]
+				nextTile := s[pos-1]
 
-					if *nextTile == 0 { // slide
-						*nextTile = *currTile
-						*currTile = 0
-					} else if *nextTile == *currTile {
-						*nextTile = *currTile * -2
-						*currTile = 0
-						break
-					}
+				// merge if next tile is same as curr tile
+				if *nextTile == *currTile {
+					*nextTile = *currTile * -2
+					*currTile = 0
+					break
 				}
+				// stop sliding if next tile is not 0
+				if *nextTile != 0 {
+					break
+				}
+				// slide
+				*nextTile = *currTile
+				*currTile = 0
 			}
 		}
 	}
-	for i := 0; i < BOARD_SIZE; i++ {
-		for j := 0; j < BOARD_SIZE; j++ {
-			b[i][j] = int(math.Abs(float64(b[i][j])))
-		}
+	for i := 0; i < SIZE; i++ {
+		*s[i] = int(math.Abs(float64(*s[i])))
 	}
-
-	return b
 }
 
-func moveDown(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
-	// don't ask me how it works cuz idk
-	for i := BOARD_SIZE - 1; i >= 0; i-- {
-		for j := 0; j < BOARD_SIZE; j++ {
-			if b[i][j] != 0 {
-				for pos := i; pos != BOARD_SIZE-1; pos++ {
-					currTile := &b[pos][j]
-					nextTile := &b[pos+1][j]
+func createVerticalSlice(b *[SIZE][SIZE]int, n int, forwards bool) []*int {
+	slice := make([]*int, 0, 4)
 
-					if *nextTile == 0 { // slide
-						*nextTile = *currTile
-						*currTile = 0
-					} else if *nextTile == *currTile {
-						*nextTile = *currTile * -2
-						*currTile = 0
-						break
-					}
-				}
-			}
+	if forwards {
+		// slice left, nth row
+		for i := 0; i < SIZE; i++ {
+			slice = append(slice, &b[i][n])
+		}
+	} else {
+		// slice right, nth row
+		for i := SIZE - 1; i >= 0; i-- {
+			slice = append(slice, &b[i][n])
 		}
 	}
-	for i := 0; i < BOARD_SIZE; i++ {
-		for j := 0; j < BOARD_SIZE; j++ {
-			b[i][j] = int(math.Abs(float64(b[i][j])))
-		}
-	}
-
-	return b
+	return slice
 }
 
-func moveLeft(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
-	// don't ask me how it works cuz idk
-	for i := 0; i < BOARD_SIZE; i++ {
-		for j := 0; j < BOARD_SIZE; j++ {
-			if b[i][j] != 0 {
-				for pos := j; pos != 0; pos-- {
-					currTile := &b[i][pos]
-					nextTile := &b[i][pos-1]
+func createHorizontalSlice(b *[SIZE][SIZE]int, n int, forwards bool) []*int {
+	slice := make([]*int, 0, 4)
 
-					if *nextTile == 0 { // slide
-						*nextTile = *currTile
-						*currTile = 0
-					} else if *nextTile == *currTile {
-						*nextTile = *currTile * -2
-						*currTile = 0
-						break
-					}
-				}
-			}
+	if forwards {
+		// slice upwards, nth column
+		for i := 0; i < SIZE; i++ {
+			slice = append(slice, &b[n][i])
+		}
+	} else {
+		// slice downwards, nth column
+		for i := SIZE - 1; i >= 0; i-- {
+			slice = append(slice, &b[n][i])
 		}
 	}
-	for i := 0; i < BOARD_SIZE; i++ {
-		for j := 0; j < BOARD_SIZE; j++ {
-			b[i][j] = int(math.Abs(float64(b[i][j])))
-		}
-	}
-
-	return b
-}
-
-func moveRight(b [BOARD_SIZE][BOARD_SIZE]int) [BOARD_SIZE][BOARD_SIZE]int {
-	// don't ask me how it works cuz idk
-	for i := 0; i < BOARD_SIZE; i++ {
-		for j := BOARD_SIZE - 1; j >= 0; j-- {
-			if b[i][j] != 0 {
-				for pos := j; pos != BOARD_SIZE-1; pos++ {
-					currTile := &b[i][pos]
-					nextTile := &b[i][pos+1]
-
-					if *nextTile == 0 { // slide
-						*nextTile = *currTile
-						*currTile = 0
-					} else if *nextTile == *currTile {
-						*nextTile = *currTile * -2
-						*currTile = 0
-						break
-					}
-				}
-			}
-		}
-	}
-	for i := 0; i < BOARD_SIZE; i++ {
-		for j := 0; j < BOARD_SIZE; j++ {
-			b[i][j] = int(math.Abs(float64(b[i][j])))
-		}
-	}
-
-	return b
+	return slice
 }
