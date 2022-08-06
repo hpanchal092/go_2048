@@ -63,6 +63,7 @@ func getInput(moves *[]string) string {
 func isValid(s *string, moves *[]string) bool {
 	// takes in a string s and checks if it is a valid input, returns a bool
 	// valid inputs start with the letter u, d, l, or r (case insensitive)
+	// ignores inputs if the move is invalid aka not in moves slice
 
 	if len(*s) == 0 {
 		return false
@@ -116,6 +117,7 @@ func addTile(b *[SIZE][SIZE]int) bool {
 func checkValidMoves(b *[SIZE][SIZE]int) []string {
 	output := make([]string, 0, 4)
 
+	// generate the 4 possible board positions from the current position
 	uB := *b
 	move("u", &uB)
 
@@ -128,6 +130,7 @@ func checkValidMoves(b *[SIZE][SIZE]int) []string {
 	rB := *b
 	move("r", &rB)
 
+	// add boards that changed to the list of valid moves
 	if *b != uB {
 		output = append(output, "u")
 	}
@@ -145,6 +148,9 @@ func checkValidMoves(b *[SIZE][SIZE]int) []string {
 }
 
 func move(input string, b *[SIZE][SIZE]int) {
+	// creates a slice representing a row/column on the board, then slides and
+	// merges pieces on the row/column
+
 	slice := []*int{}
 	for i := 0; i < SIZE; i++ {
 		switch input {
@@ -163,14 +169,16 @@ func move(input string, b *[SIZE][SIZE]int) {
 }
 
 func slideAndMerge(s []*int) {
-	for i := 1; i < SIZE; i++ {
-		if *s[i] != 0 {
-			for pos := i; pos > 0; pos-- {
+	for i := 1; i < SIZE; i++ { // loop through the tiles
+		if *s[i] != 0 { // if it has a proper value
+			for pos := i; pos > 0; pos-- { // start sliding it towards the left
 				currTile := s[pos]
 				nextTile := s[pos-1]
 
 				// merge if next tile is same as curr tile
 				if *nextTile == *currTile {
+					// makes it negative so other tiles can't merge with it in
+					// the same move
 					*nextTile = *currTile * -2
 					*currTile = 0
 					break
@@ -185,6 +193,7 @@ func slideAndMerge(s []*int) {
 			}
 		}
 	}
+	// remove the negative sign
 	for i := 0; i < SIZE; i++ {
 		*s[i] = int(math.Abs(float64(*s[i])))
 	}
@@ -194,12 +203,12 @@ func createVerticalSlice(b *[SIZE][SIZE]int, n int, forwards bool) []*int {
 	slice := make([]*int, 0, 4)
 
 	if forwards {
-		// slice left, nth row
+		// create slice left, nth row
 		for i := 0; i < SIZE; i++ {
 			slice = append(slice, &b[i][n])
 		}
 	} else {
-		// slice right, nth row
+		// create slice right, nth row
 		for i := SIZE - 1; i >= 0; i-- {
 			slice = append(slice, &b[i][n])
 		}
@@ -211,12 +220,12 @@ func createHorizontalSlice(b *[SIZE][SIZE]int, n int, forwards bool) []*int {
 	slice := make([]*int, 0, 4)
 
 	if forwards {
-		// slice upwards, nth column
+		// create slice upwards, nth column
 		for i := 0; i < SIZE; i++ {
 			slice = append(slice, &b[n][i])
 		}
 	} else {
-		// slice downwards, nth column
+		// create slice downwards, nth column
 		for i := SIZE - 1; i >= 0; i-- {
 			slice = append(slice, &b[n][i])
 		}
