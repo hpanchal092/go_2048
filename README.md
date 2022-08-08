@@ -17,12 +17,10 @@ at 2048 (hopefully).
 
  - ~~make the tiles actually move 😭~~
  - ~~make sure the tiles actually merge with each other~~
- - add comments to everything (almost done)
- - split things up into smaller functions, specifically in a way that will help
-   me build the algorithm later (specifically need to rewrite the movement
-   functions to be readable)
- - put things into multiple files so i don't have one large main.go file
-   (decided not to do this since the file isn't that long anyway)
+ - ~~add comments to everything~~
+ - ~~split things up into smaller functions, specifically in a way that will
+   help me build the algorithm later~~
+ - ~~put things into multiple files so i don't have one large main.go file~~
 
 ## build instructions
 

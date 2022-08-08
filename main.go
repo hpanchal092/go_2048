@@ -113,7 +113,6 @@ func addTile(b *[SIZE][SIZE]int) bool {
 	return true
 }
 
-// move code below to separate file eventually, or not idk
 func checkValidMoves(b *[SIZE][SIZE]int) []string {
 	output := make([]string, 0, 4)
 
